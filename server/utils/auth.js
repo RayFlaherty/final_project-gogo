@@ -1,39 +1,68 @@
-const jwt = require('jsonwebtoken');
+const { timeStamp } = require("console");
+const { model } = require("../models/User");
 
-// set token secret and expiration date
-const secret = 'mysecretsshhhhh';
-const expiration = '2h';
+const addDate = (date) => {
+  let dateString= date.toString();
 
-module.exports = {
-  // function for our authenticated routes
-  authMiddleware: function (req, res, next) {
-    // allows token to be sent via  req.query or headers
-    let token = req.query.token || req.headers.authorization;
-
-    // ["Bearer", "<tokenvalue>"]
-    if (req.headers.authorization) {
-      token = token.split(' ').pop().trim();
+  const endChar = dateString.charAt(dateString.length -1 );
+    if (endChar === '1' && dateString !== '11') {
+      dateString = `${dateString}st`;
+      
+    } else if (endChar === '2' && dateString !== '12') {
+      dateString = `${dateString}nd`;
+      
+    } else if (endChar === '3' && dateString !== '13') {
+      dateString = ` ${dateString}rd`;
+      
+    } else { dateString = `th`;
+      
     }
+    return dateString;
+  }
 
-    if (!token) {
-      return res.status(400).json({ message: 'You have no token!' });
-    }
+  module.exports = (
+    timeStamp,
+    {monthLength = ' short', dateSuffix = true} = {}
+  ) => {
+    const month = {
+      0: monthLength === 'short' ? 'Jan' : 'January',
+      1: monthLength === 'short' ? 'Feb' : 'February',
+      2: monthLength === 'short' ? 'Mar' : 'March',
+      3: monthLength === 'short' ? 'Apr' : 'April',
+      4: monthLength === 'short' ? 'May' : 'May',
+      5: monthLength === 'short' ? 'Jun' : 'June',
+      6: monthLength === 'short' ? 'Jul' : 'July',
+      7: monthLength === 'short' ? 'Aug' : 'August',
+      8: monthLength === 'short' ? 'Sep' : 'September',
+      9: monthLength === 'short' ? 'Oct' : 'October',
+      10: monthLength === 'short' ? 'Nov' : 'November',
+      11: monthLength === 'short' ? 'Dec' : 'December',
+    };
 
-    // verify token and get user data out of it
-    try {
-      const { data } = jwt.verify(token, secret, { maxAge: expiration });
-      req.user = data;
-    } catch {
-      console.log('Invalid token');
-      return res.status(400).json({ message: 'invalid token!' });
-    }
+    const dateActual = new Date(timeStamp);
+    const formattedMonth = months[dateActual.getMonth()];
 
-    // send to next endpoint
-    next();
-  },
-  signToken: function ({ username, email, _id }) {
-    const payload = { username, email, _id };
+    const dayActual = dateSuffix
+      ? addDateEnd(dateActual.getDate())
+      : dateActual.getDate();
 
-    return jwt.sign({ data: payload }, secret, { expiresIn: expiration });
-  },
-};
+    const year = dateActual.getFullYear();
+    let hour = 
+      dateActual.getHours() > 12
+      ? Math.floor(dateActual.getHours() - 12 )
+      : dateActual.getHours();
+
+      if (hour === 0 ) {
+        hour = 12;
+      }
+
+      const minutes = (dateActual.getMinutes() < 10 ? '0' : '') + dateActual.getMinutes();
+
+      const amPm = dateActual.getHours() >= 12 ? 'pm' : 'am';
+
+      const newTimeStamp = `${formattedMonth} ${dayActual}, ${year} at ${hour}:${minutes} ${amPm}`;
+
+      return newTimeStamp;
+
+
+    } 
