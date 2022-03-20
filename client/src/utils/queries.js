@@ -1,4 +1,4 @@
-import qgl from "graph-tag";
+import {gql} from "@apollo/client";
 
 export const GET_ME = gql `
 {

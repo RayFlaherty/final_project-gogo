@@ -4,6 +4,7 @@ const db = require('./config/connection');
 const{ApolloServer} = require("apollo-server-express")
 const {authMiddleware}= require("./utils/auth");
 
+
 const {typeDefs, resolvers} = require ("./schema");
 
 const app = express();
@@ -39,5 +40,6 @@ db.once('open', () => {
 
 
 db.on("error", (err) => {
-  console.err("MongoDB connection error:", err)
+  console.log("MongoDB connection error:", err)
 });
+

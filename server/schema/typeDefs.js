@@ -1,4 +1,4 @@
-const { gql } = require ('apollo-server-express;');
+const { gql } = require ('apollo-server-express');
 
 const typeDefs = gql`
     type Query {
@@ -40,7 +40,7 @@ const typeDefs = gql`
 
     type Auth {
         token: ID!
-        user: user
+        user: User
     }
 `;
 
